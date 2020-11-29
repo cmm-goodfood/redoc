@@ -16,9 +16,6 @@ const ScopeName = styled.code`
   display: inline-block;
   line-height: 1;
 
-  &:after {
-    content: ',';
-  }
   &:last-child:after {
     content: none;
   }
@@ -68,16 +65,32 @@ export class SecurityRequirement extends React.PureComponent<SecurityRequirement
     return (
       <SecurityRequirementOrWrap>
         {security.schemes.map(scheme => {
-          return (
-            <SecurityRequirementAndWrap key={scheme.id}>
-              <Link to={scheme.sectionId}>{scheme.id}</Link>
-              {scheme.scopes.length > 0 && ' ('}
-              {scheme.scopes.map(scope => (
-                <ScopeName key={scope}>{scope}</ScopeName>
-              ))}
-              {scheme.scopes.length > 0 && ') '}
-            </SecurityRequirementAndWrap>
-          );
+          if(security.schemes.length > 1) {
+            return (
+              <SecurityRequirementAndWrap key={scheme.id}>
+                <Link to={scheme.sectionId}>{scheme.id}</Link>
+                {scheme.scopes.length > 0 && ' ('}
+                {scheme.scopes.map((scope, i) => (
+                  <>
+                    <ScopeName key={scope}>{scope}</ScopeName>
+                    {scheme.scopes.length !== i + 1 && ', '}
+                  </>
+                ))}
+                {scheme.scopes.length > 0 && ') '}
+              </SecurityRequirementAndWrap>
+            );
+          } else {
+            return (
+              <SecurityRequirementAndWrap key={scheme.id}>
+                {scheme.scopes.map((scope, i) => (
+                  <>
+                    <ScopeName key={scope}>{scope}</ScopeName>
+                    {scheme.scopes.length !== i + 1 && ', '}
+                  </>
+                ))}
+              </SecurityRequirementAndWrap>
+            );
+          }
         })}
       </SecurityRequirementOrWrap>
     );
@@ -123,7 +136,7 @@ export class SecurityRequirements extends React.PureComponent<SecurityRequiremen
     return (
       <Wrap>
         <AuthHeaderColumn>
-          <AuthHeader>Authorizations: </AuthHeader>
+          <AuthHeader>Permissions: </AuthHeader>
         </AuthHeaderColumn>
         <SecuritiesColumn>
           {securities.map((security, idx) => (
